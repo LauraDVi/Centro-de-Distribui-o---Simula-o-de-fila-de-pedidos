@@ -1,0 +1,6 @@
+pedido_id,cidade_destino,produto,categoria,quantidade,valor_unitario,urgencia,tempo_estimado_horas,modal,status_pagamento
+1,SP,Arroz,Alimento,100,5,alta,10,rodoviario,ok
+2,RJ,Feijao,Alimento,200,6,media,20,ferroviario,ok
+3,MG,Milho,Alimento,150,4,baixa,15,rodoviario,pendente
+4,BA,Soja,Alimento,300,7,alta,12,ferroviario,ok
+5,PR,Cafe,Alimento,250,10,media,18,rodoviario,ok
