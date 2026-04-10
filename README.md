@@ -43,31 +43,31 @@ python centro_distribuicao.py
 ---
 
 ## O que o script faz (passo a passo)
-Etapa 1 - Lê o CSV e converte cada linha em tupla imutável.
+- Etapa 1 - Lê o CSV e converte cada linha em tupla imutável.
     --> Estrutura usada: tupla.
 
-Etapa 2 - Cria dicionário mapeando urgência → número.
+- Etapa 2 - Cria dicionário mapeando urgência → número.
     --> Estrutura usada: dicionário.
 
-Etapa 3 - Ordena a lista de tuplas por urgência→número.
+- Etapa 3 - Ordena a lista de tuplas por urgência→número.
     --> Estrutura usada: lista + `.sort()`.
 
-Etapa 4 - Move os pedidos ordenados para a fila.
+- Etapa 4 - Move os pedidos ordenados para a fila.
     --> Estrutura usada: deque.
 
-Etapa 5 - Verifica status de pagamento de cada pedido. 
+- Etapa 5 - Verifica status de pagamento de cada pedido. 
     --> Estrutura usada: dicionário.
 
-Etapa 6 - Calcula valor total recursivamente.
+- Etapa 6 - Calcula valor total recursivamente.
     --> Estrutura usada: recursão.
 
-Etapa 7 - Processa a fila (despacha ou bloqueia). 
+- Etapa 7 - Processa a fila (despacha ou bloqueia). 
     --> Estrutura usada: deque + `.popleft()`.
 
-Etapa 8 - Consolida resultados em tabela.
+- Etapa 8 - Consolida resultados em tabela.
     --> Estrutura usada: DataFrame.
 
-Etapa 9 - Gera gráficos de análise.
+- Etapa 9 - Gera gráficos de análise.
     --> Estrutura usada: matplotlib.
 
 ---
@@ -84,15 +84,15 @@ Nesta solução, convertemos o DataFrame em **lista de tuplas** antes de ordenar
 
 ## Estruturas de Dados Utilizadas
 
--Tupla:
+- Tupla:
     --> Usada em cada pedido, pois cada pedido representa um dado que não pode ser mudado durante o processamento.
 - Lista:
     --> Usada no armazenamento e ordenação, pois possibilida realizar ordenação por urgência utilizando o `.sort()`.
 - Dicionário:
     --> Usado no mapeamento de urgência e status, pois permite acesso O(1) por chave.
-Deque:
+- Deque:
     --> Usado na fila de processamento, pois permite o uso do `popleft()` em O(1).
-DataFrame:
+- DataFrame:
     --> Usado na consolidação e análise final, pois permite a análise tabular com pandas.
 ---
 
