@@ -109,3 +109,42 @@ print(
     f'Modal rodoviario: {len(df[df['modal']=='rodoviario'])} pedidos','\n'
     f'Modal ferroviario: {len(df[df['modal']=='ferroviario'])} pedidos'
 )
+
+'''Define configuracoes dos graficos.'''
+cores = {'alta':'#e74c3c', 'media':'#f39c12', 'baixa':'#2ecc71'}
+fig, axes = plt.subplots(1,3, figsize = (16,5))
+fig.subtitle('Centro de Distribuicao - Analise de Pedidos', fontsize = 14, fontweight='bold')
+
+'''Configura grafico numero 1 - urgencias (grafico de pizza).'''
+contagem = df['urgencia'].value_counts()
+coresPizza = [cores[u] for u in contagem.index]
+
+axes[0].pie(
+    contagem.values, 
+    labels=contagem.index, 
+    colors=coresPizza,
+    autopct='%1.0f%%',
+    startangle=90
+    )
+axes[0].set_title('Distribuicao por Urgencia')
+
+'''Configura grafico numero 2 - valor total por pedido (grafico de barras coloridas por urgencia).'''
+coresBarras = [cores[u] for u in df['urgencia']]
+axes[1].bar(df['produto'], df['valor_total'], color=coresBarras, edgecolor='white')
+axes[1].set_title('Valor total por pedido (R$)')
+axes[1].set_xlabel('Produto')
+axes[1].set_ylabel('Valor (R$)')
+patches = [mtpp.Patch(color=v, label=k) for k, v in cores.items()]
+axes[1].legend(handles=patches, title='Urgencia')
+
+'''Coonfigura grafico numero 3 - quantidade por modal'''
+modal_qtd = df.groupby("modal")["quantidade"].sum()
+axes[2].bar(modal_qtd.index, modal_qtd.values, color=['#3498db', '#9b59b6'], edgecolor='white')
+axes[2].set_title('Quantidade total por modal')
+axes[2].set_xlabel('Modal')
+axes[2].set_ylabel('Quantidade (unidades)')
+ 
+plt.tight_layout()
+plt.savefig('grafico_centro_distribuicao.png', dpi=150, bbox_inches='tight')
+plt.show()
+print("\nGráfico salvo como 'grafico_centro_distribuicao.png'")
