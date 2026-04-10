@@ -1,5 +1,17 @@
-# Simular um centro de distribuicao com file de pedidos.
-# priorizando pedidos por urgencia e organizar saidas logisticas
+"""
+Centro de Distribuição - Simulação de fila de pedidos
+Equipe: 
+    Laura Dantas - 564064
+    Raphael Aaron - 564067
+    Felipe Catto - 562106
+    Kimberly Kristina - 564080
+Data: 09/04/2026
+Descrição:
+    Simula o processamento de pedidos de um centro de distribuição logístico.
+    Os pedidos são priorizados por nível de urgência e organizados em uma fila
+    de saída. Pedidos com pagamento pendente são bloqueados antes do despacho.
+    Ao final, são gerados gráficos analíticos sobre o estado da operação.
+"""
 
 import pandas as pd;
 import matplotlib.pyplot as plt;
@@ -9,30 +21,36 @@ from datetime import datetime;
 
 df = pd.read_csv ('datasetPar.csv')
 
-'''Converte cada linha do dataset em uma tupla'''
-pedidos = [tuple(row) for row in df.intertuples(index=False, name=None)]
+# Converte cada linha do Dataframe em uma tupla para garantir
+# que os dados de cada pedido não sejam alterados durante o prossamento.
+pedidos = [tuple(row) for row in df.itertuples(index=False, name=None)]
 
-''' Define nivel de urgencia do pedido.'''
+# Mapeia os níveis de urgência para valores numéricos,
+#permitindo ordenação comparativa entre os pedidos.
 urgeNivel = {
     'baixa': 1,
     'media': 2,
     'alta': 3
 } 
 
-'''Deselvolve ordem do mais urgente para o menos urgente.'''
+# Ordena os pedidos do mais urgente para o menos urgente (ordem decrescente),
+# garantindo que pedidos críticos sejam processados primeiro — O(n log n).
 pedidos.sort(key=lambda pedido: urgeNivel[pedido[6]], reverse=True)
-print('\n' '-' * 20)
+print('\n' + '-' * 20)
 print('Pedidos ordenados por nível de urgencia: \n')
 for i in pedidos:
     print(f'ID {i[0]:02d} | {i[2]:<8} - {i[1]:<4} | Urgência: {i[6]:<6} | {i[8]}')
 
-'''Transfere as listas ordenadas para um deque.'''
+# Usa deque para a fila de saída pois oferece remoção O(1) pela esquerda,
+# mais eficiente do que listas comuns, que realizam essa operação em O(n).
 filaSaida = deque()
 for pedido in pedidos:
     filaSaida.append(pedido)
 print(f'\n Total de pedidos na fila de saída: {len(filaSaida)}')
 
-'''Controla o estado de cada pedido durante o processo.'''
+# Dicionário que rastreia o estado atual de cada pedido.
+# Pedidos com pagamento pendente são marcados como 'bloqueado'
+# para impedir seu despacho até que a situação seja regularizada.
 pedidoStatus = {}
 for pedido in pedidos:
     '''Bloqueia aqueles pedidos que constam o pagamento como pendente.'''
@@ -41,12 +59,21 @@ for pedido in pedidos:
     else:
         pedidoStatus[pedido[0]] = 'aguardando'
 
-'''Calcula o valor total da carga.'''
 def calculaValorTotal (pedidos, indice = 0):
-    '''
-    Calcula o valor total de todos os pedidos recursivamente.
-    Valor = quantidade (pos 4) * valorUnitario (pos 5).
-    '''
+    """
+    Calcula recursivamente o valor total de todos os pedidos.
+ 
+    A cada chamada, soma o valor do pedido na posição atual
+    (quantidade * valorUnitário) com o resultado da chamada
+    seguinte, até percorrer toda a lista.
+ 
+    Args:
+        pedidos (list): Lista de tuplas com os dados dos pedidos.
+        indice (int): Índice atual da recursão (começa em 0).
+ 
+    Returns:
+        float: Soma acumulada do valor total de todos os pedidos.
+    """
     if indice >= len(pedidos):
         return 0
     valorPedidos = pedidos [indice][4] * pedidos [indice][5]
@@ -55,13 +82,14 @@ def calculaValorTotal (pedidos, indice = 0):
 valorTotal = calculaValorTotal(pedidos)
 print(f'Valor total da carga: R$ {valorTotal:.2f}')
 
-''' Simula o centro de distribuicao despachando pedidos.'''
 pedidosProcessados = []
 pedidosBloqueados = []
 
 print('\n' + '-' * 20)
 print('Processando fila de saída')
 
+# Consome a fila de saída da esquerda para a direita, respeitando a prioridade
+# definida na etapa de ordenação. Pedidos bloqueados são separados para controle.
 while filaSaida:
     pedidoAtual = filaSaida.popleft()
     pedidoId = pedidoAtual[0]
@@ -74,7 +102,7 @@ while filaSaida:
         print(f'Despachado: ID {pedidoId:02d} | {pedidoAtual[2]:<8} | Urgência: {pedidoAtual[6]:<6} | Modal: {pedidoAtual[8]}')
         pedidosProcessados.append(pedidoAtual)
 
-'''Consolida todos os pedidos, incluindo os despachados e os bloqueados, em um DataFrame para analise e geracao de graficos.'''
+# Define os nomes das colunas na mesma ordem em que os campos aparecem nas tuplas.
 colunas = [
     'pedido_id',
     'cidade_destino',
@@ -88,10 +116,11 @@ colunas = [
     'status_pagamento'
 ]
 
+# Junta pedidos despachados e bloqueados em um único DataFrame para análise.
 todos = pedidosProcessados + pedidosBloqueados
 df = pd.DataFrame(todos, columns=colunas)
 
-'''Adiciona colunas calculadas.'''
+# Colunas calculadas adicionadas para facilitar análise e geração de gráficos.
 df['status_despacho'] = df['pedido_id'].map(pedidoStatus)
 df['valor_total'] = df['quantidade'] * df['valor_unitario']
 df['prioridade_num'] = df['urgencia'].map(urgeNivel)
@@ -110,12 +139,13 @@ print(
     f'Modal ferroviario: {len(df[df['modal']=='ferroviario'])} pedidos'
 )
 
-'''Define configuracoes dos graficos.'''
+# Paleta de cores associada a cada nível de urgência, usada nos três gráficos.
 cores = {'alta':'#e74c3c', 'media':'#f39c12', 'baixa':'#2ecc71'}
-fig, axes = plt.subplots(1,3, figsize = (16,5))
-fig.subtitle('Centro de Distribuicao - Analise de Pedidos', fontsize = 14, fontweight='bold')
 
-'''Configura grafico numero 1 - urgencias (grafico de pizza).'''
+fig, axes = plt.subplots(1,3, figsize = (16,5))
+fig.suptitle('Centro de Distribuicao - Analise de Pedidos', fontsize = 14, fontweight='bold')
+
+# Gráfico 1 — Distribuição percentual por nível de urgência (pizza).
 contagem = df['urgencia'].value_counts()
 coresPizza = [cores[u] for u in contagem.index]
 
@@ -128,7 +158,7 @@ axes[0].pie(
     )
 axes[0].set_title('Distribuicao por Urgencia')
 
-'''Configura grafico numero 2 - valor total por pedido (grafico de barras coloridas por urgencia).'''
+# Gráfico 2 — Valor total por pedido colorido por nível de urgência (barras).
 coresBarras = [cores[u] for u in df['urgencia']]
 axes[1].bar(df['produto'], df['valor_total'], color=coresBarras, edgecolor='white')
 axes[1].set_title('Valor total por pedido (R$)')
@@ -137,7 +167,7 @@ axes[1].set_ylabel('Valor (R$)')
 patches = [mtpp.Patch(color=v, label=k) for k, v in cores.items()]
 axes[1].legend(handles=patches, title='Urgencia')
 
-'''Coonfigura grafico numero 3 - quantidade por modal'''
+# Gráfico 3 — Quantidade total de unidades agrupada por modal de transporte (barras).
 modal_qtd = df.groupby("modal")["quantidade"].sum()
 axes[2].bar(modal_qtd.index, modal_qtd.values, color=['#3498db', '#9b59b6'], edgecolor='white')
 axes[2].set_title('Quantidade total por modal')
