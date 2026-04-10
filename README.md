@@ -98,15 +98,15 @@ Nesta solução, convertemos o DataFrame em **lista de tuplas** antes de ordenar
 
 ## Complexidade (Big O)
 
-Operação 1: Ordenação (`.sort()`) 
+- Operação 1: Ordenação (`.sort()`) 
     --> Complexidade: O(n log n)
-Operação 2: Inserção na deque 
+- Operação 2: Inserção na deque 
     --> Complexidade: O(1)
-Operação 3: Retirada da deque (`popleft`)  
+- Operação 3: Retirada da deque (`popleft`)  
     --> Complexidade: O(1)
-Operação 4: Consulta no dicionário  
+- Operação 4: Consulta no dicionário  
     --> Complexidade: O(1)
-Operação 5: Cálculo de valor total (recursão)  
+- Operação 5: Cálculo de valor total (recursão)  
     --> Complexidade: O(n)
 
 ---
