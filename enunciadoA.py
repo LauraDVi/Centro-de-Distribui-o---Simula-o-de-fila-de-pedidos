@@ -75,3 +75,37 @@ while filaSaida:
         pedidosProcessados.append(pedidoAtual)
 
 '''Consolida todos os pedidos, incluindo os despachados e os bloqueados, em um DataFrame para analise e geracao de graficos.'''
+colunas = [
+    'pedido_id',
+    'cidade_destino',
+    'produto',
+    'categoria',
+    'quantidade',
+    'valor_unitario',
+    'urgencia',
+    'tempo_estimado_horas',
+    'modal',
+    'status_pagamento'
+]
+
+todos = pedidosProcessados + pedidosBloqueados
+df = pd.DataFrame(todos, columns=colunas)
+
+'''Adiciona colunas calculadas.'''
+df['status_despacho'] = df['pedido_id'].map(pedidoStatus)
+df['valor_total'] = df['quantidade'] * df['valor_unitario']
+df['prioridade_num'] = df['urgencia'].map(urgeNivel)
+
+print('\n' + '-' * 20)
+print('Relatorio final - DataFrame')
+print(df[['pedido_id','produto','cidade_destino','urgencia','modal','valor_total','status_despacho']].to_string(index=False))
+
+print('\n Estatisticas: \n')
+print(
+    f'Total despachado: {len(pedidosProcessados)}','\n'
+    f'Total bloqueado: {len(pedidosBloqueados)}','\n'
+    f'Valor total: {df['valor_total'].sum():.2f}','\n'
+    f'Valor medio: {df['valor_total'].mean():.2f}', '\n'
+    f'Modal rodoviario: {len(df[df['modal']=='rodoviario'])} pedidos','\n'
+    f'Modal ferroviario: {len(df[df['modal']=='ferroviario'])} pedidos'
+)
