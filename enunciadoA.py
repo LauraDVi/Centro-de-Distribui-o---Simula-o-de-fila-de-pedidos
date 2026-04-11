@@ -4,6 +4,7 @@ Equipe:
     Laura Dantas - 564064
     Raphael Aaron - 564067
     Felipe Catto - 562106
+    Gabriel Viana - 564382
     Kimberly Kristina - 564080
 Data: 09/04/2026
 Descrição:
